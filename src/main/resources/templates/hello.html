@@ -1,12 +1,111 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
-    <meta charset="UTF-8" />
-    <title></title>
+  <title>User Management</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+      padding: 5px;
+    }
+  </style>
+  <script>
+    $(document).ready(function() {
+      // Function to fetch and display all users
+      function loadUsers() {
+        $.ajax({
+          url: 'https://special-space-garbanzo-jj7qj565j4g4cv6-8080.app.github.dev/users',
+          method: 'GET',
+          success: function(users) {
+            var tbody = $('#usersTable tbody');
+            tbody.empty();
+
+            if (users.length === 0) {
+              tbody.append('<tr><td colspan="4">No users found.</td></tr>');
+            } else {
+              users.forEach(function(user) {
+                var row = '<tr>' +
+                  '<td>' + (user.username || '') + '</td>' +
+                  '<td>' + (user.email || '') + '</td>' +
+                  '<td>' + (user.address || '') + '</td>' +
+                  '<td>' + (user.phone || '') + '</td>' +
+                  '</tr>';
+                tbody.append(row);
+              });
+            }
+          },
+          error: function() {
+            alert('Failed to load users.');
+          }
+        });
+      }
+
+      // Load users initially
+      loadUsers();
+
+      // Handle form submit
+      $('#registerForm').submit(function(e) {
+        e.preventDefault();
+
+        var userData = {
+          username: $('#username').val(),
+          email: $('#email').val(),
+          address: $('#address').val(),
+          phone: $('#phone').val()
+        };
+
+        $.ajax({
+          url: 'https://special-space-garbanzo-jj7qj565j4g4cv6-8080.app.github.dev/users',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(userData),
+          success: function(response) {
+            alert('User registered successfully!');
+            $('#registerForm')[0].reset();
+            loadUsers();  // Refresh user list
+          },
+          error: function(xhr) {
+            alert('Error: ' + xhr.responseText);
+          }
+        });
+      });
+    });
+  </script>
 </head>
 <body>
-<p>
-    <span th:text="${hello}">Hello!</span>
-</p>
+
+  <h2>User List</h2>
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>Phone</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- User rows go here -->
+    </tbody>
+  </table>
+
+  <h2>Register New User</h2>
+  <form id="registerForm">
+    <label>Username:</label><br>
+    <input type="text" id="username" required><br><br>
+
+    <label>Email:</label><br>
+    <input type="email" id="email" required><br><br>
+
+    <label>Address:</label><br>
+    <input type="text" id="address"><br><br>
+
+    <label>Phone:</label><br>
+    <input type="text" id="phone"><br><br>
+
+    <button type="submit">Register</button>
+  </form>
+
 </body>
 </html>
