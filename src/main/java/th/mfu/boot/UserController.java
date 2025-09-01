@@ -19,7 +19,7 @@ public class UserController {
             return new ResponseEntity<>("Username already exists", HttpStatus.CONFLICT);
         }
         users.put(user.getUsername(), user);
-        return new ResponseEntity<>("User created", HttpStatus.CREATED);
+        return new ResponseEntity<>("User created", HttpStatus.OK);
     }
 
     @GetMapping("/users/{username}")
